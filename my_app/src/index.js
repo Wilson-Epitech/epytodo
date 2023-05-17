@@ -20,9 +20,7 @@ async function DisplayDataTable(pool, tableName)
           return;
         }
         console.log(`Données de la table '${tableName}':`);
-        rows.forEach((row) => {
-          console.log(row);
-        });
+        console.log(rows);
     } catch (error) {
         console.error(`Une erreur s'est produite lors de l'affichage des données de la table '${tableName}':`, error);
     } finally {
@@ -32,20 +30,54 @@ async function DisplayDataTable(pool, tableName)
     }
 }
 
-app.post('/register', async (req, res) =>
-{
-    const firstname = req.body.firstname;
-    const name = req.body.name;
-    const password = req.body.password;
-    const email = req.body.email;
-    try {
-        const sql = 'INSERT INTO user (firstname, name, password, email) VALUES (?, ?, ?, ?)';
-        const result = await db.pool.query(sql, [firstname, name, password, email]);
-        res.send('GG tu es inscrit');
-    } catch (err) {
-        throw err;
-    }
-    DisplayDataTable(db.pool, 'user');
+app.post('/register', async (req, res) => {
+  let conn;
+  try {
+      conn = await db.pool.getConnection();
+      const firstname = req.body.firstname;
+      const name = req.body.name;
+      const password = req.body.password;
+      const email = req.body.email;
+      const mail_sql = 'SELECT email FROM user WHERE email = ?';
+      const check_mail = await conn.query(mail_sql, [email]);
+      if (check_mail.length > 0) {
+          res.send("Account already exists");
+      } else {
+          const sql = 'INSERT INTO user (firstname, name, password, email) VALUES (?, ?, ?, ?)';
+          const insert_infos = await conn.query(sql, [firstname, name, password, email]);
+          res.send("GG tu es inscrit");
+      }
+  } catch (err) {
+      throw err;
+  } finally {
+      if (conn) {
+          conn.release();
+      }
+  }
+});
+
+app.post('/login', async (req, res) => {
+  let conn;
+  try {
+      conn = await db.pool.getConnection();
+      const email = req.body.email;
+      const password = req.body.password;
+      const mail_sql = 'SELECT email FROM user WHERE email = ?';
+      const password_sql = 'SELECT password FROM user WHERE password = ?';
+      const check_mail = await conn.query(mail_sql, [email]);
+      const check_password = await conn.query(password_sql, [password]);
+      if (check_mail.length > 0 && check_password.length > 0) {
+          res.send("Connecté bg");
+      } else {
+          res.send("Informations incorrectes bg");
+      }
+  } catch (err) {
+      throw(err);
+  } finally {
+      if (conn) {
+          conn.release();
+      }
+  }
 });
 
 app.delete('/users/:id', async (req, res) =>
@@ -97,11 +129,11 @@ app.get('/user', async (req, res) => {
 });
 
 app.use((req, res, next) => {
-    res.status(404).send('404 Not Found.');
+    res.status(404).send('Not found');
 });
 
 app.use((err, req, res, next) => {
-    res.status(500).send('Internal Server Error.');
+    res.status(500).send('Internal server error');
 });
 
 app.listen(port, () => {
