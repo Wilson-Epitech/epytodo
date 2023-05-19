@@ -52,6 +52,10 @@ CREATE TABLE `user` (
   `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+ALTER TABLE `user`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  ADD PRIMARY KEY (`id`);
+
 --
 -- Index pour les tables déchargées
 --
@@ -67,7 +71,6 @@ ALTER TABLE `todo`
 -- Index pour la table `user`
 --
 ALTER TABLE `user`
-  ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `email` (`email`);
 
 --
@@ -78,12 +81,6 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT pour la table `todo`
 --
 ALTER TABLE `todo`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `user`
---
-ALTER TABLE `user`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
