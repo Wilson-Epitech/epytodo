@@ -3,7 +3,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../../config/db');
 const globals = require('../../middleware/global.js');
-const secretkey = 'secretkey';
 const app = express.Router();
 
 app.post('/register', async (req, res) =>
@@ -12,7 +11,7 @@ app.post('/register', async (req, res) =>
   const name = req.body.name;
   const password = req.body.password;
   const email = req.body.email;
-  if (!firstname || !name || !password || !email) {const app = express();
+  if (!firstname || !name || !password || !email) {
     return res.status(400).json({msg: 'Bad parameter'});
   }
   let conn;
@@ -29,7 +28,7 @@ app.post('/register', async (req, res) =>
     const insert_infos = await conn.query(sql, [firstname, name, hash, email]);
     const id_sql = 'SELECT id FROM user WHERE email = ?';
     const get_id = await conn.query(id_sql, [email]);
-    const token = jwt.sign(get_id[0].id, secretkey);
+    const token = jwt.sign(get_id[0].id, process.env.SECRETKEY);
     res.setHeader('Authorization', `Bearer ${token}`);
     res.status(200).json({token: token});
   } catch (err) {
@@ -60,7 +59,7 @@ app.post('/login', async (req, res) => {
           globals.setLoggedUserEmail(email);
           const id_sql = 'SELECT id FROM user WHERE email = ?';
           const get_id = await conn.query(id_sql, [email]);
-          const token = jwt.sign(get_id[0].id, secretkey);
+          const token = jwt.sign(get_id[0].id, process.env.SECRETKEY);
           res.setHeader('Authorization', `Bearer ${token}`);
           res.status(200).json({token: token});
         } else {

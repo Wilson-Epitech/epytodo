@@ -3,7 +3,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../../config/db');
 const globals = require('../../middleware/global.js');
-const secretkey = 'secretkey';
 const app = express.Router();
 
 async function DisplayUserInfoByEmail(pool, tableName, res, user_email)
@@ -126,7 +125,7 @@ function verify_token(req, res)
   }
   try {
     const token = req.headers.authorization.split(' ')[1];
-    const verify = jwt.verify(token, secretkey);
+    const verify = jwt.verify(token, process.env.SECRETKEY);
     if (verify) {
       return true;
     } else {

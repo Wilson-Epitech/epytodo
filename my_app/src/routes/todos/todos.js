@@ -2,7 +2,6 @@ const express = require("express");
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../../config/db');
-const secretkey = 'secretkey';
 const app = express.Router();
 
 async function DisplayUserDataTableById(pool, tableName, identifier)
@@ -50,7 +49,7 @@ async function DisplayUserInfoById(pool, tableName, res, id)
       };
       return JSON.stringify(user, null, 2);
     }).join('\n\n');
-    res.send(`n${data}`);
+    res.send(`${data}`);
   } catch (error) {
     res.send(`Une erreur s'est produite lors de l'affichage des données de la table '${tableName}'.`);
   } finally {
@@ -122,7 +121,7 @@ function verify_token(req, res)
   }
   try {
     const token = req.headers.authorization.split(' ')[1];
-    const verify = jwt.verify(token, secretkey);
+    const verify = jwt.verify(token, process.env.SECRETKEY);
     if (verify) {
       return true;
     } else {
@@ -148,6 +147,7 @@ app.get('/todos/:identifier', async (req, res) =>
     return;
   }
   const identifier = req.params.identifier;
+  console.log(identifier)
   DisplayUserInfoById(db.pool, 'todo', res, identifier);
   DisplayUserDataTableById(db.pool, 'todo', identifier);
 });
