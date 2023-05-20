@@ -145,7 +145,6 @@ app.get('/user', async (req, res) =>
         return;
     }
     const user_email = globals.getLoggedUserEmail();
-    console.log(user_email);
     DisplayUserInfoByEmail(db.pool, 'user', res, user_email);
     DisplayUserDataTableByEmail(db.pool, 'user', user_email);
 });
