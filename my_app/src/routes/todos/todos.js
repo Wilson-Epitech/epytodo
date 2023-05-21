@@ -226,7 +226,7 @@ function verify_token(req, res)
   }
   try {
     const token = req.headers.authorization.split(' ')[1];
-    const verify = jwt.verify(token, process.env.SECRETKEY);
+    const verify = jwt.verify(token, process.env.SECRET);
     if (verify) {
       return true;
     } else {

@@ -1,11 +1,12 @@
 const mariadb = require('mariadb');
+require('dotenv').config({ path: '../.env' });
 
 const pool = mariadb.createPool({
-    host: '127.0.0.1',
+    host: process.env.MYSQL_HOST,
     port: 3306,
-    user: 'root',
-    password: 'wilson',
-    database: 'epytodo',
+    user: process.env.MYSQL_USER,
+    password: process.env.MYSQL_ROOT_PASSWORD,
+    database: process.env.MYSQL_DATABASE,
 });
 
 module.exports = Object.freeze({

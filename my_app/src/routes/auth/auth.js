@@ -28,7 +28,7 @@ app.post('/register', async (req, res) =>
     const insert_infos = await conn.query(sql, [firstname, name, hash, email]);
     const id_sql = 'SELECT id FROM user WHERE email = ?';
     const get_id = await conn.query(id_sql, [email]);
-    const token = jwt.sign(get_id[0].id, process.env.SECRETKEY);
+    const token = jwt.sign(get_id[0].id, process.env.SECRET);
     res.setHeader('Authorization', `Bearer ${token}`);
     res.status(200).json({token: token});
   } catch (err) {
@@ -62,7 +62,7 @@ app.post('/login', async (req, res) => {
           globals.setLoggedUserId(check_id[0].id);
           const id_sql = 'SELECT id FROM user WHERE email = ?';
           const get_id = await conn.query(id_sql, [email]);
-          const token = jwt.sign(get_id[0].id, process.env.SECRETKEY);
+          const token = jwt.sign(get_id[0].id, process.env.SECRET);
           res.setHeader('Authorization', `Bearer ${token}`);
           res.status(200).json({token: token});
         } else {
