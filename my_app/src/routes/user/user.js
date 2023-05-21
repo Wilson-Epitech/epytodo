@@ -148,14 +148,6 @@ app.get('/user', async (req, res) =>
     DisplayUserDataTableByEmail(db.pool, 'user', user_email);
 });
 
-app.get('/user/todos', async (req, res) =>
-{
-  if (!verify_token(req, res)) {
-    return;
-  }
-  DisplayUserInfoById(db.pool, 'todo', res, user_id);
-});
-
 app.get('/users/:identifier', async (req, res) =>
 {
   if (!verify_token(req, res)) {

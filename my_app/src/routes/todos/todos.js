@@ -2,6 +2,7 @@ const express = require("express");
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../../config/db');
+const globals = require('../../middleware/global.js');
 const app = express.Router();
 
 async function DisplayUserDataTableById(pool, tableName, identifier)
@@ -46,6 +47,74 @@ async function DisplayUserInfoById(pool, tableName, res, id)
         password: row.password,
         firstname: row.firstname,
         created : row.created_at,
+        user_id : row.user_id,
+        status : row.status,
+      };
+      return JSON.stringify(user, null, 2);
+    }).join('\n\n');
+    res.send(`${data}`);
+  } catch (error) {
+    res.send(`Une erreur s'est produite lors de l'affichage des données de la table '${tableName}'.`);
+  } finally {
+    if (conn) {
+      conn.release();
+    }
+  }
+}
+
+async function DisplayTodoInfoById(pool, tableName, res, id)
+{
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const sql = `SELECT * FROM ${tableName} WHERE id = ?`;
+    const rows = await conn.query(sql, [id]);
+    if (rows.length === 0) {
+      res.send(`Aucune donnée trouvée dans la table '${tableName}'.`);
+      return;
+    }
+    const data = rows.map((row) => {
+      const user = {
+        id: row.id,
+        title: row.title,
+        description: row.description,
+        created_at: row.created_at,
+        due_time: row.due_time,
+        user_id: row.user_id,
+        status: row.status
+      };
+      return JSON.stringify(user, null, 2);
+    }).join('\n\n');
+    res.send(`${data}`);
+  } catch (error) {
+    res.send(`Une erreur s'est produite lors de l'affichage des données de la table '${tableName}'.`);
+  } finally {
+    if (conn) {
+      conn.release();
+    }
+  }
+}
+
+async function DisplayTodoInfoByUserId(pool, tableName, res, user_id)
+{
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const sql = `SELECT * FROM ${tableName} WHERE user_id = ?`;
+    const rows = await conn.query(sql, [user_id]);
+    if (rows.length === 0) {
+      res.send(`Aucune donnée trouvée dans la table '${tableName}'.`);
+      return;
+    }
+    const data = rows.map((row) => {
+      const user = {
+        id: row.id,
+        title: row.title,
+        description: row.description,
+        created_at: row.created_at,
+        due_time: row.due_time,
+        user_id: row.user_id,
+        status: row.status
       };
       return JSON.stringify(user, null, 2);
     }).join('\n\n');
@@ -141,14 +210,23 @@ app.get('/todos', async (req, res) =>
   }
 });
 
+app.get('/user/todos', async (req, res) =>
+{
+  if (!verify_token(req, res)) {
+    return;
+  }
+  const id = globals.getLoggedUserId()  ;
+  DisplayTodoInfoById(db.pool, 'todo', res, id);
+});
+
 app.get('/todos/:identifier', async (req, res) =>
 {
   if (!verify_token(req, res)) {
     return;
   }
   const identifier = req.params.identifier;
-  console.log(identifier)
-  DisplayUserInfoById(db.pool, 'todo', res, identifier);
+  console.log(identifier);
+  DisplayTodoInfoById(db.pool, 'todo', res, identifier);
   DisplayUserDataTableById(db.pool, 'todo', identifier);
 });
 
@@ -184,6 +262,7 @@ app.post('/todos', async (req, res) =>
   } catch (err) {
     throw err;
   }
+  DisplayTodoInfoByUserId(db.pool, 'todo', res, user_id);
   DisplayDataTable(db.pool, 'todo');
 });
 
@@ -220,8 +299,9 @@ app.put('/todos/:id', async (req, res) =>
     if (check_id2.length === 0) {
       return res.status(404).json({ msg: `Not found` });
     }
-    const sql = 'UPDATE todo SET title = ?, description = ?, due_time = ?, user_id = ?, status = ?';
-    const result = await db.pool.query(sql, [title, description, due_time, user_id, todo_status]);
+    const sql = 'UPDATE todo SET title = ?, description = ?, due_time = ?, user_id = ?, status = ? WHERE id = ?';
+    const result = await db.pool.query(sql, [title, description, due_time, user_id, todo_status, todo_id]);
+    DisplayTodoInfoById(db.pool, 'todo', res, todo_id);
   } catch (err) {
     throw err;
   }

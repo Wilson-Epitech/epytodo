@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
 const app = express();
-require('dotenv').config();
+require('dotenv').config({ path: '../.env' });
 const port = process.env.PORT;
 
 app.use(express.json());

@@ -53,10 +53,13 @@ app.post('/login', async (req, res) => {
     const password_sql = 'SELECT password FROM user WHERE email = ?';
     const check_mail = await conn.query(mail_sql, [email]);
     const check_password = await conn.query(password_sql, [email]);
+    const id_sql = 'SELECT id FROM user WHERE email = ?'
+    const check_id = await conn.query(id_sql, [email]);
     if (check_mail.length > 0 && check_password.length > 0) {
       const result = await bcrypt.compare(password, check_password[0].password);
         if (result) {
           globals.setLoggedUserEmail(email);
+          globals.setLoggedUserId(check_id[0].id);
           const id_sql = 'SELECT id FROM user WHERE email = ?';
           const get_id = await conn.query(id_sql, [email]);
           const token = jwt.sign(get_id[0].id, process.env.SECRETKEY);
