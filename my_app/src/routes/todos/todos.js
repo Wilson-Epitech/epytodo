@@ -128,6 +128,42 @@ async function DisplayTodoInfoByUserId(pool, tableName, res, user_id)
   }
 }
 
+async function DisplayLastTodoCreated(pool, tableName, res, user_id)
+{
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const found_last_id_sql = `SELECT MAX(id) AS max_number FROM ${tableName} WHERE user_id = ?`;
+    const last_todo_id = await conn.query(found_last_id_sql, [user_id]);
+    const sql = `SELECT * FROM ${tableName} WHERE id = ?`;
+    const rows = await conn.query(sql, [last_todo_id[0].max_number]);
+    if (rows.length === 0) {
+      res.send(`Aucune donnée trouvée dans la table '${tableName}'.`);
+      return;
+    }
+    const data = rows.map((row) => {
+      const user = {
+        id: row.id,
+        title: row.title,
+        description: row.description,
+        created_at: row.created_at,
+        due_time: row.due_time,
+        user_id: row.user_id,
+        status: row.status
+      };
+      return JSON.stringify(user, null, 2);
+    }).join('\n\n');
+    res.send(`${data}`);
+  } catch (error) {
+    res.send(`Une erreur s'est produite lors de l'affichage des données de la table '${tableName}'.`);
+  } finally {
+    if (conn) {
+      conn.release();
+    }
+  }
+}
+
+
 async function DisplayDataTable(pool, tableName)
 {
   let conn;
@@ -225,7 +261,6 @@ app.get('/todos/:identifier', async (req, res) =>
     return;
   }
   const identifier = req.params.identifier;
-  console.log(identifier);
   DisplayTodoInfoById(db.pool, 'todo', res, identifier);
   DisplayUserDataTableById(db.pool, 'todo', identifier);
 });
@@ -262,7 +297,7 @@ app.post('/todos', async (req, res) =>
   } catch (err) {
     throw err;
   }
-  DisplayTodoInfoByUserId(db.pool, 'todo', res, user_id);
+  DisplayLastTodoCreated(db.pool, 'todo', res, user_id);
   DisplayDataTable(db.pool, 'todo');
 });
 
@@ -292,7 +327,7 @@ app.put('/todos/:id', async (req, res) =>
     const id_sql1 = 'SELECT id FROM todo WHERE id = ?';
     const check_id1 = await db.pool.query(id_sql1, [todo_id]);
     if (check_id1.length === 0) {
-      return res.status(400).json({ msg: "Bad parameter"});
+      return res.status(400).json({ msg: 'Not found'});
     }
     const id_sql2 = 'SELECT id FROM user WHERE id = ?';
     const check_id2 = await db.pool.query(id_sql2, [user_id]);
