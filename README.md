@@ -14,7 +14,7 @@
 
 <p align="center"><img src=".github/assets/term-epytodo.png" alt="EpyTodo" width="820"/></p>
 
-## En deux mots
+## Le projet en quelques mots
 
 Notre première API web : des utilisateurs, des tâches, et une authentification par token. Les mots de passe sont hachés, les routes sont protégées, et on a ajouté en bonus une petite interface web.
 
@@ -25,10 +25,6 @@ Notre première API web : des utilisateurs, des tâches, et une authentification
 - CRUD des utilisateurs (`/user`, `/users/:id`) et des tâches (`/todos`, `/todos/:id`, `/user/todos`)
 - Schéma MySQL fourni (`epytodo.sql`)
 - Bonus : interface web (inscription, connexion, liste et suppression des tâches)
-
-## Sous le capot
-
-Express avec un routeur par ressource et un middleware qui vérifie le token sur les routes privées. Les mots de passe sont hachés avec `bcryptjs` avant d'être stockés.
 
 ## Lancer le projet
 
@@ -44,4 +40,4 @@ cd my_app && npm install && node src/index.js
 
 Yanis Harkouk, Wilson Bordichon
 
-**Ma part :** J'ai monté le **serveur Express** et la structure du projet, les routes des **tâches**, l'inscription, la suppression d'utilisateurs, le **schéma SQL** et l'**interface web** bonus.
+**Ma partition :** J'ai monté le **serveur Express** et la structure du projet, les routes des **tâches**, l'inscription, la suppression d'utilisateurs, le **schéma SQL** et l'**interface web** bonus.
