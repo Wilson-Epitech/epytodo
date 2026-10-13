@@ -30,7 +30,6 @@ Notre première API web : des utilisateurs, des tâches, et une authentification
 
 ```bash
 mysql -u root -p epytodo < epytodo.sql
-# .env à la racine : MYSQL_HOST, MYSQL_USER, MYSQL_ROOT_PASSWORD, MYSQL_DATABASE, PORT, SECRET
 cd my_app && npm install && node src/index.js
 ```
 
