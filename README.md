@@ -39,4 +39,4 @@ cd my_app && npm install && node src/index.js
 
 Yanis Harkouk, Wilson Bordichon
 
-**Ma partition :** J'ai monté le **serveur Express** et la structure du projet, les routes des **tâches** et des utilisateurs, l'inscription, le **schéma SQL** et l'**interface web** bonus.
+**Ma partition :** J'ai monté le **serveur Express** et la structure du projet, une partie des routes (tâches, inscription, suppression d'utilisateurs), le **schéma SQL** avec Yanis, et l'**interface web** bonus.
